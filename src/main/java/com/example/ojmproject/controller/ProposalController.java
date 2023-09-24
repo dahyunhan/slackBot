@@ -19,7 +19,7 @@ import java.util.Objects;
 @RestController
 @RequestMapping("/slackBot")
 public class ProposalController {
-    String json = null;
+
     ArrayList<String> nameList = new ArrayList<>();
 
     @PostMapping("/proposal")
@@ -40,7 +40,7 @@ public class ProposalController {
         base.setBlocks(blocks);
 
         ObjectMapper objectMapper = new ObjectMapper();
-        json = objectMapper.writeValueAsString(base);
+        String json = objectMapper.writeValueAsString(base);
 
         return json;
     }
@@ -52,6 +52,7 @@ public class ProposalController {
 
         String name = rootNode.get("user").get("name").asText();
         String response_url = rootNode.get("response_url").asText();
+
         JsonNode button = rootNode.get("actions").get(0);
         String actionId = button.get("action_id").asText();
 
@@ -61,12 +62,9 @@ public class ProposalController {
         Base base = new Base();
         ArrayList<Object> blocks = new ArrayList<>();
         ArrayList<Object> elements = new ArrayList<>();
-        if (actionId.equals("button_click_action1")) {
-            base.setResponse_type("in_channel");
-            base.setReplace_original(true);
-            base.setText("마감됨");
-        } else
-            elements.add(new Elements("button_click_action", "button", new Button("plain_text", "저염", true), "primary"));
+
+
+        elements.add(new Elements("button_click_action", "button", new Button("plain_text", "저염", true), "primary"));
         elements.add(new Elements("button_click_action1", "button", new Button("plain_text", "마감", true), "danger"));
 
         blocks.add(new Blocks("divider"));
@@ -88,14 +86,12 @@ public class ProposalController {
         base.setCallback_id("clickBtn");
         base.setBlocks(blocks);
 
+
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", "application/json");
 
-
         HttpEntity<Base> entity = new HttpEntity<>(base, headers);
         RestTemplate restTemplate = new RestTemplate();
-
-
         ResponseEntity<String> response = restTemplate.exchange(response_url, HttpMethod.POST,
                 entity,
                 String.class);
@@ -108,8 +104,3 @@ public class ProposalController {
     }
 
 }
-//  if (actionId.equals("button_click_action1")) {
-//          base.setResponse_type("in_channel");
-//          base.setReplace_original(true);
-//          base.setText("마감됨");
-//          } else {
