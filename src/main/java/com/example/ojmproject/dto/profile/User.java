@@ -1,4 +1,4 @@
-package com.example.ojmproject.dto;
+package com.example.ojmproject.dto.profile;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -8,6 +8,9 @@ import lombok.Setter;
 public class User {
 
 
+    public User(){
+
+    }
     private String id;
     private String username;
     private String team_id;
