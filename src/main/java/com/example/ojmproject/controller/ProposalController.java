@@ -13,8 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+
 
 @RestController
 @RequestMapping("/slackBot")
@@ -56,51 +55,65 @@ public class ProposalController {
         JsonNode button = rootNode.get("actions").get(0);
         String actionId = button.get("action_id").asText();
 
-        System.out.println(actionId);
-
-
-        Base base = new Base();
-        ArrayList<Object> blocks = new ArrayList<>();
-        ArrayList<Object> elements = new ArrayList<>();
-
-
-        elements.add(new Elements("button_click_action", "button", new Button("plain_text", "저염", true), "primary"));
-        elements.add(new Elements("button_click_action1", "button", new Button("plain_text", "마감", true), "danger"));
-
-        blocks.add(new Blocks("divider"));
-        blocks.add(new Proposal("section", new Message("plain_text", "커피 드실 분?")));
-        blocks.add(new Actions("actions", "block_id_1", elements));
-
-        ArrayList<Object> eventBlocks = new ArrayList<>();
-        nameList.add(name);
-        for (int i = 0; i < nameList.size(); i++) {
-            NameText nameText = new NameText("plain_text", nameList.get(i) + "님이 신청했음");
-            eventBlocks.add(nameText);
-        }
-
-        blocks.add(new EventBase("context", eventBlocks));
-
-
-        base.setResponse_type("in_channel");
-        base.setType("block_actions");
-        base.setCallback_id("clickBtn");
-        base.setBlocks(blocks);
-
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", "application/json");
+        ArrayList<Object> eventBlocks = new ArrayList<>();
 
-        HttpEntity<Base> entity = new HttpEntity<>(base, headers);
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> response = restTemplate.exchange(response_url, HttpMethod.POST,
-                entity,
-                String.class);
+        if (actionId.equals("button_click_action1")) {
+            DangerBase dangerBase = new DangerBase();
+            dangerBase.setReplace_original(true);
+          dangerBase.setText("주문 마감!");
+            HttpEntity<DangerBase> entity = new HttpEntity<>(dangerBase, headers);
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<String> response = restTemplate.exchange(response_url, HttpMethod.POST,
+                    entity,
+                    String.class);
 
-        String json = objectMapper.writeValueAsString(response);
+            String json = objectMapper.writeValueAsString(response);
 
-        return json;
+            return json;
+        } else {
+
+            Base base = new Base();
+            ArrayList<Object> blocks = new ArrayList<>();
+            ArrayList<Object> elements = new ArrayList<>();
 
 
+            elements.add(new Elements("button_click_action", "button", new Button("plain_text", "저염", true), "primary"));
+            elements.add(new Elements("button_click_action1", "button", new Button("plain_text", "마감", true), "danger"));
+
+            blocks.add(new Blocks("divider"));
+            blocks.add(new Proposal("section", new Message("plain_text", "커피 드실 분?")));
+            blocks.add(new Actions("actions", "block_id_1", elements));
+
+
+            nameList.add(name);
+            for (int i = 0; i < nameList.size(); i++) {
+                NameText nameText = new NameText("plain_text", nameList.get(i) + "님이 신청했음");
+                eventBlocks.add(nameText);
+            }
+
+            blocks.add(new EventBase("context", eventBlocks));
+
+
+            base.setResponse_type("in_channel");
+            base.setType("block_actions");
+            base.setCallback_id("clickBtn");
+            base.setBlocks(blocks);
+
+
+            HttpEntity<Base> entity = new HttpEntity<>(base, headers);
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<String> response = restTemplate.exchange(response_url, HttpMethod.POST,
+                    entity,
+                    String.class);
+
+            String json = objectMapper.writeValueAsString(response);
+            System.out.println(json);
+            return json;
+
+        }
     }
 
 }
